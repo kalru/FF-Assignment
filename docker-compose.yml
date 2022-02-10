@@ -1,0 +1,21 @@
+version: "3.9"
+   
+services:
+  web:
+    build:
+      context: .
+    command: >
+      sh -c ". /venv/bin/activate $$
+             python main/manage.py makemigrations &&
+             python main/manage.py migrate &&
+             python main/manage.py createsuperuser --noinput &&
+             python main/manage.py runscript setup_demo &&
+             python main/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SUPERUSER_PASSWORD=admin
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@example.com

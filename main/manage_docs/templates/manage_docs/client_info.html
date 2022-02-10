@@ -1,0 +1,117 @@
+{% extends "manage_docs/base.html" %}
+
+{% block content %}
+
+{% load index %}
+
+<form method="post" action="">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="box mt-5">
+        <div class="content">
+            <h3> {{ client.user.username }} details</h3>
+            <table>
+                <thead>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Username</td>
+                        <td>{{ client.user.username }}</td>
+                    </tr>
+                    <tr>
+                        <td>First name</td>
+                        <td>{{ client.user.first_name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Last name</td>
+                        <td>{{ client.user.last_name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>{{ client.user.email }}</td>
+                    </tr>
+                    <tr>
+                        <td>Last login</td>
+                        <td>{{ client.user.last_login }}</td>
+                    </tr>
+                    <tr>
+                        <td>Date registered</td>
+                        <td>{{ client.user.date_joined }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="box">
+        <div class="content">
+            <h3> {{ client.user.username}} documents</h3>
+            <div class="content is-small has-text-grey-light">
+                Check if submitted documents are valid, and whether a request for them should be sent or not.
+            </div>
+        </div>
+        <!-- only include valid document fields -->
+        {% for field in form %}
+            {% with document=client.document_set.all|document_from_valid_html_name:field.html_name %}
+                {% if document %}
+                <div class="box">
+                    <div class="content">
+                        <p><strong>Document name:</strong> {{ document.name }}</p>
+                        <p>
+                            <strong>File:</strong> 
+                            {% if document.file %}
+                                <a href="{{ document.file.url }}">
+                                {{ document.file }}
+                                </a>
+                            {% else %}
+                            <em>Not available</em>
+                            {% endif %}
+                        </p>
+                        <p style="{% if not document.file %}display: none;{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="checkbox">
+                                {{ field }}
+                                Valid
+                            </label>
+                            {{ field.errors }}
+                        </p>
+                        <p>
+                            {% with document_request_field=form|get_document_request_field_from_valid:field.html_name %}
+                            <label for="{{ document_request_field.id_for_label }}" class="checkbox">
+                                {{ document_request_field }}
+                                Send document request
+                            </label>
+                            {{ document_request_field.errors }}
+                            {% endwith %}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            {% endwith %}
+        {% endfor %}
+    </div>
+
+    <div class="field is-grouped is-grouped-right">
+        <p class="control">
+            <a class="button" onclick="request_invalid_documents()">
+                Select invalid documents
+            </a>
+        </p>
+        <p class="control">
+            <input type="submit" value="Submit" class="button is-info"></input>
+        </p>
+    </div>
+</form>
+
+<script>
+    function request_invalid_documents(){
+        // use two filters to get the relevant inputs for valid
+        const valid = document.querySelectorAll('[name^="document_"][name$="_valid"]');
+        Array.from(valid).forEach(v => {
+            if (!v.checked) {
+                const id = v.name.match(/[0-9]+/i)[0];
+                document.querySelector(`[name="document_${id}_request"]`).checked = true
+            }
+        });
+    }
+</script>
+
+{% endblock %}

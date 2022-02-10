@@ -1,0 +1,23 @@
+{% extends "manage_docs/base.html" %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero-body">
+        <div class="box">
+            <p class="title">
+                Successfully submitted documents!
+            </p>
+            <p class="subtitle mt-5">
+                <strong>{{ client.user.first_name }} {{ client.user.last_name }}</strong>, please wait 1-2 business days to hear back from your relationship manager
+                <strong>{{ client.relationship_manager.user.first_name }} {{ client.relationship_manager.user.last_name }}</strong> 
+                (<span class="has-text-info">{{ client.relationship_manager.user.email }}</span>) if the documents are valid or not.
+            </p>
+            <p class="has-text-grey-light mt-5">
+                You can now close this tab.
+            </p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

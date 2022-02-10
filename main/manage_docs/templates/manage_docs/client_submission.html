@@ -1,0 +1,36 @@
+{% extends "manage_docs/base.html" %}
+
+{% block content %}
+
+{% load index %}
+
+<form enctype="multipart/form-data" method="post" action="">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="box mt-5">
+        <div class="content">
+            <h3>Document submission</h3>
+            <p> <strong>{{ client.user.first_name }} {{ client.user.last_name }}</strong>, please submit the following documents 
+                as requested by <strong>{{ client.relationship_manager.user.first_name }} {{ client.relationship_manager.user.last_name }}</strong>:</p>
+        </div>
+
+        {% for field in form %}
+            {% with document=client.document_set.all|get_document_from_file_html_name:field.html_name %}
+                {% if document %}
+                    <div class="box">
+                        <label for="{{ field.id_for_label }}" class="label">{{ document.name }}</label>
+                        {{ field }}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        {% endfor %}
+    </div>
+    <div class="field is-grouped is-grouped-right">
+        <p class="control">
+            <input type="submit" value="Submit" class="button is-info"></input>
+        </p>
+    </div>
+</form>
+
+{% endblock %}

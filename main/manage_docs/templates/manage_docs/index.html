@@ -1,0 +1,82 @@
+{% extends "manage_docs/base.html" %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero-body">
+        <div class="box">
+            <p class="title">
+                How to use this demo
+            </p>
+            <div class="content is-medium mt-5">
+                <p><em>Author: Kalvyn Roux</em></p>
+                <h6>Demo data</h6>
+                <p>
+                    During setup, the <em>setup_demo.py</em> is run to populate the default sqlite database with inital Relationship Managers (RMs), clients, and documents. Note that
+                    all linked documents to clients are inialized as NULL, and must thus be populated during the demo with any type of file. There is no list of links to specific views, since
+                    the generated data is random. Follow the explanation below and start from the client list view and test different <em>id</em> vanlues starting from 1. You can use the
+                    admin interface for more fine grained control over the created data.
+                </p>
+                <h6>Client list</h6>
+                <p>
+                    RMs can access their list of clients using the following url schema: <span>/clients/<em>{id of RM}</em>/</span>.
+                    For example, <a href="/clients/1/">/clients/1/</a> will show a list of clients under the the RM with <em>id</em> = 1. This page 
+                    shows some basic information of each client in a table, and determines which clients to show depending on the <em>id</em> passed in the url. As per specification,
+                    this demo does not implement authentication, thus this view only verifies if the given <em>id</em> is valid (and hence implicitly assumes that the current user is authenticated
+                    for the view). In a real system, the <em>id</em> would not be needed, as the list of clients could be inferred from the user that was currently logged in and authenticated for the view.
+                    This view also has a button that goes to a more detailed page for each respective client.
+                </p>
+                <h6>Client info</h6>
+                <p>
+                    The aforementioned page links to a view with more detail of a specific client with the following schema: <span>/client/<em>{id of client}</em>/</span>. For example, 
+                    <a href="/client/1/">/client/1/</a> will show more information about the client with <em>id</em> = 1. This view also shows the RM which documents
+                    were submitted (or not), with a checkbox to indicate if the RM approves if the submitted document is valid or not (if there is a file). This choice gets saved on submission. Finally, each
+                    document also has a checkbox to indicate if a document request for it needs to be sent on submission.
+                </p>
+                <p>
+                    There is also a button which auto-selects all invalid documents to save time for the RM. Note that this view, like the previous view, also assumes the current user is authorized to use this view. 
+                    Hence this view also only verifies if the provided client <em>id</em> is valid or not. On submission, if document requests had to be made, the generated email that would have been sent to the client in
+                    production is printed out to the command line, since this is only a development environment. Due to the lack of authorization, the link provided to the client in the email also assumes
+                    that the client is authorized to upload the required documents. I also recognize that merely using url parameters to define the fields of the dynamic submission form may have unintended consequences from the
+                    context of authorization. They can potentially be altered without permission without triggering any red flags to hide/show extra fields not requested by the relationship manager. To solve this issue, one could impliment a more secure signed
+                    url in production.
+                </p>
+                <h6>Document submission</h6>
+                <p>
+                    After the client has recieved his/her email, they can click the provided link to go to a form with fields corresponding to the required documents. This view has the
+                    following schema: <span>/submission/<em>{id of client}</em>/?<em>{document url parameters}</em></span>. For example, <a href="/submission/1/?ID=True">/submission/1/?ID=True</a> 
+                    will show a document field (with a name of <em>ID</em>) associated with a client with <em>id</em> = 1. The same authorization assumptions mentioned for previous views apply here.
+                    When the requested documents have been successfully submitted by the client, his/her RM is notified via email with a relevant link on which documents have been submitted, and the client
+                    is redirected to a success page.
+                </p>
+                <h6>Possible Improvements</h6>
+                <ul>
+                    <li>
+                        The specification did not mention functionality to add or remove documents from clients, or clients from RMs. Currently the admin interface is used to add 
+                        any kind of initial data. In the future the given views could be extended to allow the addition, removal, or editing of documents, clients, and RMs.
+                    </li>
+                    <li>
+                        Currently only sqlite is used as a databse. In production a reliable database like postgres in a HA configuration could be used to provide better performance and reliability.
+                    </li>
+                    <li>
+                        Currently uploaded files are stored on disk where the app is being run. This is very inefficient in terms of cost, and could be replaced by a storage service like S3
+                        in production.
+                    </li>
+                    <li>
+                        As mentioned previously, user authentication is a must in a production system. It will not only improve security, but also reduce complexity as the app gets bigger compared
+                        to authentication without logging in.
+                    </li>
+                    <li>
+                        Currently sent emails that would have been sent are printed out in the command line. This is only good for a development environment, and need to be ammended in production.
+                    </li>
+                    <li>
+                        Bulma was used for CSS, but only minimally. In a production system a CSS framework like Tailwind could be more beneficial in the long run as it is more customizable. CSS and JS
+                        files could also be served from S3 like user documents.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

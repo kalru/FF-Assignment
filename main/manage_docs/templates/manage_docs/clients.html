@@ -1,0 +1,48 @@
+{% extends "manage_docs/base.html" %}
+
+{% block content %}
+    {% if object_list %}
+    <div class="box mt-5">
+        <div class="content">
+            <h3>Client list</h3>
+        </div>
+        <table class="table is-hoverable is-striped is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Documents</th>
+                    <th>Last Login</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in object_list %}
+                    <tr>
+                    <td style="width: 1%; white-space: nowrap;">{{ client.user.username }}</td>
+                    <td style="width: 1%; white-space: nowrap;">{{ client.user.first_name }}</td>
+                    <td style="width: 1%; white-space: nowrap;">{{ client.user.last_name }}</td>
+                    <td style="width: 1%; white-space: nowrap;">{{ client.user.email }}</td>
+                    <td style="width: 1%; white-space: nowrap;" class="{% if client.valid_document_count == client.document_set.all.count %}has-text-success{% else %}has-text-danger{% endif %}">
+                        {{ client.valid_document_count }}/{{ client.document_set.all.count }}
+                    </td>
+                    <td style="width: 1%; white-space: nowrap;">{{ client.user.last_login }}</td>
+                    <td style="width: 1%; white-space: nowrap;">
+                        <button class="button is-link is-inverted">
+                            <a class="is-link is-light" href="{% url 'client-info' pk=client.id %}">Manage Documents</a>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>  
+    {% else %}
+    <article class="message is-info mt-5">
+        <div class="message-body">
+            <p>No clients to show...</p>
+        </div>
+    </article>
+    {% endif %}
+{% endblock %}
